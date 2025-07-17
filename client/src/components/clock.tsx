@@ -22,9 +22,9 @@ const Clock = ({ time, isActive, color }: ClockProps) => {
 
     const getClockStyle = () => {
         const baseStyle = "px-4 py-2 rounded-lg font-mono text-xl font-bold transition-all";
-        const colorStyle = color === 'white' ? "bg-gray-100 text-gray-900" : "bg-gray-900 text-gray-100";
-        const activeStyle = isActive ? "ring-4 ring-blue-500 shadow-lg" : "";
-        const lowTimeStyle = displayTime < 10000 ? "text-red-500" : "";
+        const colorStyle = color === 'white' ? "bg-white/10 text-white border border-white/20" : "bg-black/20 text-gray-300 border border-white/10";
+        const activeStyle = isActive ? "ring-1 ring-white/60 shadow-[0_0_20px_rgba(255,255,255,0.3)]" : "";
+        const lowTimeStyle = displayTime < 10000 ? "!text-red-400 animate-pulse" : "";
         
         return `${baseStyle} ${colorStyle} ${activeStyle} ${lowTimeStyle}`;
     };

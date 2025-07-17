@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { AuthForm } from '@/components/auth-form';
 import { getCurrentUser, logout } from '@/services/auth';
+import { ShootingStars } from '@/components/ui/shooting-stars';
+import { StarsBackground } from '@/components/ui/stars-background';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -43,35 +45,41 @@ const Home = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
-            <div className="text-center">
-                <h1 className="text-4xl font-bold mb-2">Appear Chess Arena</h1>
-                <p className="text-gray-400 mb-8">¯\_(ツ)_/¯</p>
+        <div className="min-h-screen relative bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden">
+            <ShootingStars />
+            <StarsBackground />
+            <div className="relative z-10 p-8">
+                <div className="text-center">
+                    <h1 className="text-5xl md:text-7xl font-bold mb-2 bg-gradient-to-b from-white via-gray-200 to-gray-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] selection:bg-transparent">
+                        Appear Chess Arena
+                    </h1>
+                    <p className="text-gray-400 mb-8 text-lg">¯\_(ツ)_/¯</p>
                 
-                {user.username ? (
-                    <div className="space-y-4">
-                        <div className="mb-6">
-                            <p className="text-lg">Welcome, <span className="font-bold">{user.username?.toUpperCase()}</span></p>
-                            <p className="text-sm text-gray-400">Elo: {user.elo}</p>
-                        </div>
-                        <button
-                            onClick={createGame}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-                        >
-                            Create Game
-                        </button>
-                        <div>
+                    {user.username ? (
+                        <div className="space-y-4">
+                            <div className="mb-6">
+                                <p className="text-xl">Welcome, <span className="font-bold text-white">{user.username?.toUpperCase()}</span></p>
+                                <p className="text-sm text-gray-500">Elo: {user.elo}</p>
+                            </div>
                             <button
-                                onClick={handleLogout}
-                                className="text-sm text-gray-400 hover:text-gray-200 underline"
+                                onClick={createGame}
+                                className="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]"
                             >
-                                Logout
+                                Create Game
                             </button>
+                            <div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm text-gray-500 hover:text-gray-300 underline transition-colors"
+                                >
+                                    Logout
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <AuthForm onSuccess={handleAuthSuccess} />
-                )}
+                    ) : (
+                        <AuthForm onSuccess={handleAuthSuccess} />
+                    )}
+                </div>
             </div>
         </div>
     );

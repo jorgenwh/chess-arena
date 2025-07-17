@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, logout } from '@/services/auth';
+import { ShootingStars } from '@/components/ui/shooting-stars';
+import { StarsBackground } from '@/components/ui/stars-background';
 
 interface User {
     username: string;
@@ -110,17 +112,21 @@ const Admin = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
-                <div className="text-center">Loading...</div>
+            <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5] p-8 relative overflow-hidden">
+                <ShootingStars />
+                <StarsBackground />
+                <div className="text-center relative z-10">Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5] p-8 relative overflow-hidden">
+            <ShootingStars />
+            <StarsBackground />
+            <div className="max-w-6xl mx-auto relative z-10">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold">Admin Panel</h1>
+                    <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
                     <div className="flex gap-4">
                         <button
                             onClick={async () => {
@@ -143,7 +149,7 @@ const Admin = () => {
                                     alert('Network error while clearing database');
                                 }
                             }}
-                            className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-lg transition-colors"
+                            className="bg-red-600/20 backdrop-blur-sm hover:bg-red-600/30 text-red-300 border border-red-600/30 px-4 py-2 rounded-lg transition-all"
                         >
                             Clear Database
                         </button>
@@ -152,16 +158,16 @@ const Admin = () => {
                                 logout();
                                 navigate('/');
                             }}
-                            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors"
+                            className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-lg transition-all"
                         >
                             Back to Home
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-gray-800 rounded-lg overflow-hidden">
+                <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
                     <table className="w-full">
-                        <thead className="bg-gray-700">
+                        <thead className="bg-white/10">
                             <tr>
                                 <th className="px-6 py-3 text-left">Username</th>
                                 <th className="px-6 py-3 text-left">Elo Rating</th>
@@ -170,11 +176,11 @@ const Admin = () => {
                         </thead>
                         <tbody>
                             {users.map((user) => (
-                                <tr key={user.username} className="border-t border-gray-700">
+                                <tr key={user.username} className="border-t border-white/10">
                                     <td className="px-6 py-4 font-medium">
                                         {user.username}
                                         {user.username === 'admin' && (
-                                            <span className="ml-2 text-xs bg-yellow-600 px-2 py-1 rounded">ADMIN</span>
+                                            <span className="ml-2 text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-2 py-1 rounded">ADMIN</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4">
@@ -184,18 +190,18 @@ const Admin = () => {
                                                     type="number"
                                                     value={editingElo.value}
                                                     onChange={(e) => setEditingElo({ ...editingElo, value: e.target.value })}
-                                                    className="bg-gray-700 px-2 py-1 rounded w-24"
+                                                    className="bg-white/10 border border-white/20 px-2 py-1 rounded w-24 text-white"
                                                     min="0"
                                                 />
                                                 <button
                                                     onClick={() => updateElo(user.username)}
-                                                    className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded text-sm"
+                                                    className="bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/30 px-2 py-1 rounded text-sm"
                                                 >
                                                     Save
                                                 </button>
                                                 <button
                                                     onClick={() => setEditingElo(null)}
-                                                    className="bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded text-sm"
+                                                    className="bg-white/10 hover:bg-white/20 border border-white/20 px-2 py-1 rounded text-sm"
                                                 >
                                                     Cancel
                                                 </button>
@@ -205,7 +211,7 @@ const Admin = () => {
                                                 <span>{user.elo_rating}</span>
                                                 <button
                                                     onClick={() => setEditingElo({ username: user.username, value: user.elo_rating.toString() })}
-                                                    className="text-blue-400 hover:underline text-sm"
+                                                    className="text-gray-400 hover:text-white hover:underline text-sm transition-colors"
                                                 >
                                                     Edit
                                                 </button>
@@ -221,17 +227,17 @@ const Admin = () => {
                                                         value={resettingPassword.value}
                                                         onChange={(e) => setResettingPassword({ ...resettingPassword, value: e.target.value })}
                                                         placeholder="New password"
-                                                        className="bg-gray-700 px-2 py-1 rounded"
+                                                        className="bg-white/10 border border-white/20 px-2 py-1 rounded text-white"
                                                     />
                                                     <button
                                                         onClick={() => resetPassword(user.username)}
-                                                        className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded text-sm"
+                                                        className="bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/30 px-2 py-1 rounded text-sm"
                                                     >
                                                         Set
                                                     </button>
                                                     <button
                                                         onClick={() => setResettingPassword(null)}
-                                                        className="bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded text-sm"
+                                                        className="bg-white/10 hover:bg-white/20 border border-white/20 px-2 py-1 rounded text-sm"
                                                     >
                                                         Cancel
                                                     </button>
@@ -240,14 +246,14 @@ const Admin = () => {
                                                 <>
                                                     <button
                                                         onClick={() => setResettingPassword({ username: user.username, value: '' })}
-                                                        className="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-sm"
+                                                        className="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded text-sm"
                                                     >
                                                         Reset Password
                                                     </button>
                                                     {user.username !== 'admin' && (
                                                         <button
                                                             onClick={() => deleteUser(user.username)}
-                                                            className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+                                                            className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 px-3 py-1 rounded text-sm"
                                                         >
                                                             Delete
                                                         </button>
@@ -262,7 +268,7 @@ const Admin = () => {
                     </table>
                 </div>
 
-                <div className="mt-4 text-center text-gray-400">
+                <div className="mt-4 text-center text-gray-500">
                     Total users: {users.length}
                 </div>
             </div>

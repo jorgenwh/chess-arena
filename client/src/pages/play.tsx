@@ -4,6 +4,9 @@ import ChessBoard from '@/components/chess-board';
 import { socketService } from '@/services/socket';
 import { getLocalNetworkInfo } from '@/utils/network';
 import { getCurrentUser } from '@/services/auth';
+import { ShootingStars } from '@/components/ui/shooting-stars';
+import { StarsBackground } from '@/components/ui/stars-background';
+import { LoaderFive } from '@/components/ui/loader';
 
 const Play = () => {
     const { gameId } = useParams();
@@ -95,11 +98,14 @@ const Play = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center justify-center p-4 relative">
+        <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            <ShootingStars />
+            <StarsBackground />
+            
             {/* Leave button in top-left corner */}
             <button
                 onClick={handleLeaveGame}
-                className="absolute top-4 left-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                className="absolute top-4 left-4 z-20 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2 border border-white/20"
             >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -107,16 +113,16 @@ const Play = () => {
                 Leave Game
             </button>
             
-            <h1 className="text-3xl font-bold mb-4">Play Chess</h1>
+            <div className="relative z-10 flex flex-col items-center">
             
             {linkCopied && (
-                <div className="bg-green-600 text-white px-4 py-2 rounded mb-4">
+                <div className="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg mb-4 border border-white/20">
                     Game link copied to clipboard! Share it with your opponent.
                 </div>
             )}
             
             {showNetworkInfo && (
-                <div className="bg-blue-600 text-white px-4 py-2 rounded mb-4 max-w-2xl">
+                <div className="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg mb-4 max-w-2xl border border-white/20">
                     <p className="font-bold mb-1">For local network play:</p>
                     <p className="text-sm">{getLocalNetworkInfo().instructions}</p>
                     <p className="text-sm mt-1">Replace "localhost" in the URL with your IP address.</p>
@@ -124,17 +130,18 @@ const Play = () => {
             )}
             
             {waitingForOpponent && playerColor === 'white' && (
-                <div className="bg-blue-600 text-white px-4 py-2 rounded mb-4">
-                    Waiting for opponent to join...
+                <div className="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-lg mb-4 border border-white/20 flex items-center justify-center">
+                    <LoaderFive text="Waiting for opponent to join..." />
                 </div>
             )}
             
-            <ChessBoard 
-                playerColor={playerColor}
-                gameId={gameId}
-                waitingForOpponent={waitingForOpponent}
-                gameState={gameState}
-            />
+                <ChessBoard 
+                    playerColor={playerColor}
+                    gameId={gameId}
+                    waitingForOpponent={waitingForOpponent}
+                    gameState={gameState}
+                />
+            </div>
         </div>
     );
 }

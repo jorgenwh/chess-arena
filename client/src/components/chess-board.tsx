@@ -157,19 +157,13 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
     };
 
     return (
-        <div className="bg-gray-800 p-8 rounded-lg shadow-2xl">
+        <div className="bg-white/5 backdrop-blur-sm p-8 rounded-lg shadow-[0_0_40px_rgba(255,255,255,0.1)] border border-white/10">
             <div className="flex flex-col items-center space-y-4">
                 {/* Opponent's info and clock (top) */}
-                <div className="text-center">
+                <div className="text-center space-y-3">
                     <p className="text-lg font-bold">
                         {playerColor === 'white' ? blackUsername : whiteUsername} 
                         <span className="text-gray-400 ml-2">({playerColor === 'white' ? blackElo : whiteElo})</span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                        Time: {formatTimeControl(
-                            playerColor === 'white' ? blackTime : whiteTime,
-                            playerColor === 'white' ? blackIncrement : whiteIncrement
-                        )}
                     </p>
                     <Clock 
                         time={playerColor === 'white' ? blackTime : whiteTime}
@@ -179,24 +173,32 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
                 </div>
                 
                 {/* Chess board */}
-                <div className="w-[600px]">
+                <div className="w-[600px] relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-black/20 rounded-lg blur-xl"></div>
                     <Chessboard 
                         options={{
                             position: game.fen(),
                             onPieceDrop: onDrop,
                             boardOrientation: playerColor,
                             boardStyle: {
-                                borderRadius: '4px',
-                                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)',
+                                borderRadius: '8px',
+                                boxShadow: '0 0 40px rgba(255, 255, 255, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
                                 width: '600px',
                                 height: '600px'
+                            },
+                            darkSquareStyle: {
+                                backgroundColor: '#6b7280'
+                            },
+                            lightSquareStyle: {
+                                backgroundColor: '#f3f4f6'
                             }
                         }}
                     />
                 </div>
                 
                 {/* Player's info and clock (bottom) */}
-                <div className="text-center">
+                <div className="text-center space-y-3">
                     <Clock 
                         time={playerColor === 'white' ? whiteTime : blackTime}
                         isActive={gameStarted && !game.game_over() && game.turn() === playerColor[0]}
@@ -206,35 +208,23 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
                         {playerColor === 'white' ? whiteUsername : blackUsername} 
                         <span className="text-gray-400 ml-2">({playerColor === 'white' ? whiteElo : blackElo})</span>
                     </p>
-                    <p className="text-sm text-gray-500">
-                        Time: {formatTimeControl(
-                            playerColor === 'white' ? whiteTime : blackTime,
-                            playerColor === 'white' ? whiteIncrement : blackIncrement
-                        )}
-                    </p>
                 </div>
             </div>
             
-            <div className="mt-4 text-center">
-                {!gameStarted ? (
-                    <p className="text-yellow-400">Waiting for opponent to join...</p>
-                ) : (
-                    <>
-                        {gameOverReason ? (
-                            <p className="text-red-500 font-bold text-xl">{gameOverReason}</p>
-                        ) : (
-                            <>
-                                <p className="text-gray-400">
-                                    {game.game_over() ? 'Game Over' : `${game.turn() === 'w' ? 'White' : 'Black'} to move`}
-                                </p>
-                                {game.in_checkmate() && <p className="text-red-500 font-bold">Checkmate!</p>}
-                                {game.in_draw() && <p className="text-yellow-500 font-bold">Draw!</p>}
-                                {game.in_check() && !game.in_checkmate() && <p className="text-orange-500 font-bold">Check!</p>}
-                            </>
-                        )}
-                    </>
-                )}
-            </div>
+            {gameStarted && (
+                <div className="mt-4 text-center">
+                    {gameOverReason ? (
+                        <p className="text-white font-bold text-xl">{gameOverReason}</p>
+                    ) : (
+                        <>
+                            {game.game_over() && <p className="text-gray-400">Game Over</p>}
+                            {game.in_checkmate() && <p className="text-red-500 font-bold">Checkmate!</p>}
+                            {game.in_draw() && <p className="text-yellow-500 font-bold">Draw!</p>}
+                            {game.in_check() && !game.in_checkmate() && <p className="text-orange-500 font-bold">Check!</p>}
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
