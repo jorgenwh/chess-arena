@@ -15,9 +15,15 @@ interface ChessBoardProps {
 const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false, gameState }: ChessBoardProps) => {
     const [game, setGame] = useState(new Chess());
     const [gameStarted, setGameStarted] = useState(false);
-    const [whiteTime, setWhiteTime] = useState(3 * 60 * 1000); // 3 minutes
-    const [blackTime, setBlackTime] = useState(3 * 60 * 1000); // 3 minutes
+    const [whiteTime, setWhiteTime] = useState(5 * 60 * 1000); // 5 minutes default
+    const [blackTime, setBlackTime] = useState(5 * 60 * 1000); // 5 minutes default
+    const [whiteIncrement, setWhiteIncrement] = useState(5 * 1000); // 5 seconds default
+    const [blackIncrement, setBlackIncrement] = useState(5 * 1000); // 5 seconds default
     const [gameOverReason, setGameOverReason] = useState<string | null>(null);
+    const [whiteUsername, setWhiteUsername] = useState<string>('White');
+    const [blackUsername, setBlackUsername] = useState<string>('Black');
+    const [whiteElo, setWhiteElo] = useState<number>(1200);
+    const [blackElo, setBlackElo] = useState<number>(1200);
 
     useEffect(() => {
         // Update game when game state changes from server
@@ -32,6 +38,28 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
             }
             if (gameState.blackTime !== undefined) {
                 setBlackTime(gameState.blackTime);
+            }
+            
+            // Update increments
+            if (gameState.whiteIncrement !== undefined) {
+                setWhiteIncrement(gameState.whiteIncrement);
+            }
+            if (gameState.blackIncrement !== undefined) {
+                setBlackIncrement(gameState.blackIncrement);
+            }
+            
+            // Update usernames and Elo
+            if (gameState.whiteUsername) {
+                setWhiteUsername(gameState.whiteUsername);
+            }
+            if (gameState.blackUsername) {
+                setBlackUsername(gameState.blackUsername);
+            }
+            if (gameState.whiteElo !== undefined) {
+                setWhiteElo(gameState.whiteElo);
+            }
+            if (gameState.blackElo !== undefined) {
+                setBlackElo(gameState.blackElo);
             }
         }
     }, [gameState, waitingForOpponent]);
@@ -58,14 +86,24 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
             setGameOverReason(message);
         };
 
+        // Listen for Elo updates
+        const handleEloUpdate = ({ whiteElo, blackElo, whiteUsername, blackUsername }: any) => {
+            setWhiteElo(whiteElo);
+            setBlackElo(blackElo);
+            setWhiteUsername(whiteUsername);
+            setBlackUsername(blackUsername);
+        };
+
         socket.on('clock-update', handleClockUpdate);
         socket.on('game-over', handleGameOver);
         socket.on('opponent-forfeited', handleOpponentForfeit);
+        socket.on('elo-updated', handleEloUpdate);
 
         return () => {
             socket.off('clock-update', handleClockUpdate);
             socket.off('game-over', handleGameOver);
             socket.off('opponent-forfeited', handleOpponentForfeit);
+            socket.off('elo-updated', handleEloUpdate);
         };
     }, []);
 
@@ -111,16 +149,34 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
     };
 
     const opponentColor = playerColor === 'white' ? 'black' : 'white';
+    
+    const formatTimeControl = (time: number, increment: number) => {
+        const minutes = Math.floor(time / 60000);
+        const incrementSeconds = Math.floor(increment / 1000);
+        return `${minutes}+${incrementSeconds}`;
+    };
 
     return (
         <div className="bg-gray-800 p-8 rounded-lg shadow-2xl">
             <div className="flex flex-col items-center space-y-4">
-                {/* Opponent's clock (top) */}
-                <Clock 
-                    time={playerColor === 'white' ? blackTime : whiteTime}
-                    isActive={gameStarted && !game.game_over() && game.turn() !== playerColor[0]}
-                    color={opponentColor}
-                />
+                {/* Opponent's info and clock (top) */}
+                <div className="text-center">
+                    <p className="text-lg font-bold">
+                        {playerColor === 'white' ? blackUsername : whiteUsername} 
+                        <span className="text-gray-400 ml-2">({playerColor === 'white' ? blackElo : whiteElo})</span>
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        Time: {formatTimeControl(
+                            playerColor === 'white' ? blackTime : whiteTime,
+                            playerColor === 'white' ? blackIncrement : whiteIncrement
+                        )}
+                    </p>
+                    <Clock 
+                        time={playerColor === 'white' ? blackTime : whiteTime}
+                        isActive={gameStarted && !game.game_over() && game.turn() !== playerColor[0]}
+                        color={opponentColor}
+                    />
+                </div>
                 
                 {/* Chess board */}
                 <div className="w-[600px]">
@@ -139,12 +195,24 @@ const ChessBoard = ({ playerColor = 'white', gameId, waitingForOpponent = false,
                     />
                 </div>
                 
-                {/* Player's clock (bottom) */}
-                <Clock 
-                    time={playerColor === 'white' ? whiteTime : blackTime}
-                    isActive={gameStarted && !game.game_over() && game.turn() === playerColor[0]}
-                    color={playerColor}
-                />
+                {/* Player's info and clock (bottom) */}
+                <div className="text-center">
+                    <Clock 
+                        time={playerColor === 'white' ? whiteTime : blackTime}
+                        isActive={gameStarted && !game.game_over() && game.turn() === playerColor[0]}
+                        color={playerColor}
+                    />
+                    <p className="text-lg font-bold">
+                        {playerColor === 'white' ? whiteUsername : blackUsername} 
+                        <span className="text-gray-400 ml-2">({playerColor === 'white' ? whiteElo : blackElo})</span>
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        Time: {formatTimeControl(
+                            playerColor === 'white' ? whiteTime : blackTime,
+                            playerColor === 'white' ? whiteIncrement : blackIncrement
+                        )}
+                    </p>
+                </div>
             </div>
             
             <div className="mt-4 text-center">

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ChessBoard from '@/components/chess-board';
 import { socketService } from '@/services/socket';
 import { getLocalNetworkInfo } from '@/utils/network';
+import { getCurrentUser } from '@/services/auth';
 
 const Play = () => {
     const { gameId } = useParams();
@@ -16,6 +17,13 @@ const Play = () => {
     useEffect(() => {
         if (!gameId) return;
 
+        // Check if user is logged in
+        const user = getCurrentUser();
+        if (!user.username) {
+            navigate('/');
+            return;
+        }
+
         // Connect to server
         const socket = socketService.connect();
         
@@ -26,8 +34,8 @@ const Play = () => {
         }
         sessionStorage.setItem(`joined-${gameId}`, 'true');
 
-        // Join game
-        socket.emit('join-game', { gameId, isCreator });
+        // Join game with username
+        socket.emit('join-game', { gameId, isCreator, username: user.username });
 
         // Handle server responses
         socket.on('game-joined', ({ color, gameState }) => {
